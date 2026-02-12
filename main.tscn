@@ -1,0 +1,46 @@
+[gd_scene format=3 uid="uid://ddy5co3xitvo7"]
+
+[ext_resource type="Script" uid="uid://ctqr1sxxhqxnx" path="res://sheriff.gd" id="1_ig7tw"]
+
+[node name="Node2D" type="Node2D" unique_id=695825713]
+
+[node name="Sheriff" type="Button" parent="." unique_id=390216503]
+offset_left = 52.0
+offset_top = 409.0
+offset_right = 228.0
+offset_bottom = 482.0
+text = "Sheriff"
+script = ExtResource("1_ig7tw")
+
+[node name="Label" type="Label" parent="Sheriff" unique_id=755119]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="Stinger" type="Button" parent="." unique_id=1270168344]
+offset_left = 56.0
+offset_top = 525.0
+offset_right = 232.0
+offset_bottom = 598.0
+text = "Stinger"
+
+[node name="Sniper Rifle" type="Button" parent="." unique_id=986973585]
+offset_left = 63.0
+offset_top = 155.0
+offset_right = 239.0
+offset_bottom = 228.0
+text = "Sniper Rifle"
+
+[node name="Shotgun" type="Button" parent="." unique_id=1170290597]
+offset_left = 62.0
+offset_top = 278.0
+offset_right = 238.0
+offset_bottom = 351.0
+text = "Shotgun"
+
+[node name="Assault Rifle" type="Button" parent="." unique_id=650751699]
+offset_left = 63.0
+offset_top = 33.0
+offset_right = 239.0
+offset_bottom = 106.0
+text = "Assault Rifle"
