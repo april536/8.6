@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://4klf2rqhr15a" path="res://Game.gd" id="1_1bvp3"]
 [ext_resource type="Script" uid="uid://ctqr1sxxhqxnx" path="res://sheriff.gd" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://dcw7bvc7bj46l" path="res://Stinger.gd" id="2_0xm2m"]
 [ext_resource type="Script" uid="uid://bbla2g2unijgb" path="res://Enemy.gd" id="4_lquwl"]
 
 [node name="Node2D" type="Node2D" unique_id=695825713]
@@ -30,12 +31,7 @@ offset_top = 525.0
 offset_right = 232.0
 offset_bottom = 598.0
 text = "Stinger"
-script = ExtResource("1_ig7tw")
-base_damage = 20.0
-rpm = 500.0
-mag_size = 30
-reload_time = 2.0
-crit_chance = 0.03
+script = ExtResource("2_0xm2m")
 
 [node name="Label" type="Label" parent="Node/Stinger" unique_id=1067009205]
 layout_mode = 0
@@ -48,17 +44,6 @@ offset_top = 155.0
 offset_right = 239.0
 offset_bottom = 228.0
 text = "Sniper Rifle"
-script = ExtResource("1_ig7tw")
-base_damage = 400.0
-rpm = 30.0
-mag_size = 3
-reload_time = 4.3
-crit_chance = 0.1
-
-[node name="Label" type="Label" parent="Node/Sniper Rifle" unique_id=247753103]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
 
 [node name="Shotgun" type="Button" parent="Node" unique_id=1170290597]
 offset_left = 62.0
@@ -66,17 +51,6 @@ offset_top = 278.0
 offset_right = 238.0
 offset_bottom = 351.0
 text = "Shotgun"
-script = ExtResource("1_ig7tw")
-base_damage = 225.0
-rpm = 50.0
-mag_size = 5
-reload_time = 4.4
-crit_chance = 0.2
-
-[node name="Label" type="Label" parent="Node/Shotgun" unique_id=408695895]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
 
 [node name="Assault Rifle" type="Button" parent="Node" unique_id=650751699]
 offset_left = 63.0
@@ -84,17 +58,6 @@ offset_top = 33.0
 offset_right = 239.0
 offset_bottom = 106.0
 text = "Assault Rifle"
-script = ExtResource("1_ig7tw")
-base_damage = 30.0
-rpm = 300.0
-mag_size = 30
-reload_time = 3.05
-crit_chance = 0.05
-
-[node name="Label" type="Label" parent="Node/Assault Rifle" unique_id=1657902762]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
 
 [node name="Node2D" type="Node2D" parent="." unique_id=469815466]
 position = Vector2(52, 409)

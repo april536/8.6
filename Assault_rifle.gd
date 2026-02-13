@@ -1,13 +1,13 @@
 extends Button
-class_name WeaponButton
+class_name Assault_Rifle
 
 signal deal_damage(damage: float)
 
-@export var base_damage: float = 60.0
-@export var rpm: float = 10.0
-@export var mag_size: int = 10
-@export var reload_time: float = 2.1
-@export var crit_chance: float = 0.55
+@export var base_damage: float = 30.0
+@export var rpm: float = 300.0
+@export var mag_size: int = 30
+@export var reload_time: float = 3.05
+@export var crit_chance: float = 0.05
 
 @onready var label: Label = $Label
 
