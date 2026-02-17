@@ -23,7 +23,7 @@ func _ready() -> void:
 	_shots_left = mag_size
 
 	_fire_timer = Timer.new()
-	_fire_timer.one_shot = true  # 关键：每发都“精确排下一发”
+	_fire_timer.one_shot = true  # 关键：每发都“精确排下一发”11
 	add_child(_fire_timer)
 	_fire_timer.timeout.connect(_on_fire_tick)
 
