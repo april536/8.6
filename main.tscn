@@ -6,7 +6,7 @@
 
 [node name="Node2D" type="Node2D" unique_id=695825713]
 script = ExtResource("1_1bvp3")
-enemy_path = NodePath("Node2D")
+enemy_path = NodePath("Enemy")
 weapons_container_path = NodePath("Node")
 
 [node name="Node" type="Node" parent="." unique_id=262590347]
@@ -96,20 +96,34 @@ layout_mode = 0
 offset_right = 40.0
 offset_bottom = 23.0
 
-[node name="Node2D" type="Node2D" parent="." unique_id=469815466]
+[node name="Enemy" type="Node2D" parent="." unique_id=469815466]
 position = Vector2(52, 409)
 script = ExtResource("4_lquwl")
-health_bar_path = NodePath("ProgressBar")
+health_bar_path = NodePath("Health Bar")
 hp_label_path = NodePath("Label")
+hp_input_path = NodePath("HP Input")
 
-[node name="ProgressBar" type="ProgressBar" parent="Node2D" unique_id=1116509239]
+[node name="Set Health" type="Label" parent="Enemy" unique_id=1580018887]
+offset_left = 657.0
+offset_top = -188.0
+offset_right = 742.0
+offset_bottom = -165.0
+text = "Set Health:"
+
+[node name="Health Bar" type="ProgressBar" parent="Enemy" unique_id=1116509239]
 offset_left = 478.0
 offset_top = -124.0
 offset_right = 1018.0
 offset_bottom = -97.0
 
-[node name="Label" type="Label" parent="Node2D" unique_id=1664665857]
-offset_left = 727.0
-offset_top = -78.0
-offset_right = 767.0
-offset_bottom = -55.0
+[node name="Label" type="Label" parent="Enemy" unique_id=1664665857]
+offset_left = 735.0
+offset_top = -62.0
+offset_right = 775.0
+offset_bottom = -39.0
+
+[node name="HP Input" type="LineEdit" parent="Enemy" unique_id=723036445]
+offset_left = 760.0
+offset_top = -190.0
+offset_right = 901.0
+offset_bottom = -159.0
