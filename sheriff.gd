@@ -2,24 +2,22 @@ extends Button
 class_name WeaponButton
 
 signal deal_damage(damage: float)
+signal auto_fire_changed(is_on: bool)
 
 @export var base_damage: float = 60.0
 @export var rpm: float = 10.0
 @export var mag_size: int = 10
 @export var reload_time: float = 2.1
 @export var crit_chance: float = 0.55
-@export var max_queue: int = 2 # 冷却期间最多缓冲几次点击
 
-@onready var label: Label = $Label
+@onready var label: Label = get_node_or_null("Label") as Label
 
 var _shots_left: int
-var _is_holding := false
 var _is_reloading := false
+var _auto_fire := false
 
-var _fire_timer: Timer        # 作为“冷却/下一发允许”的计时器
+var _fire_timer: Timer
 var _reload_timer: Timer
-
-var _queued_shots: int = 0    # 冷却期间的点击缓冲
 
 func _ready() -> void:
 	randomize()
@@ -28,84 +26,71 @@ func _ready() -> void:
 	_fire_timer = Timer.new()
 	_fire_timer.one_shot = true
 	add_child(_fire_timer)
-	_fire_timer.timeout.connect(_on_fire_ready)
+	_fire_timer.timeout.connect(_on_fire_timer_timeout)
 
 	_reload_timer = Timer.new()
 	_reload_timer.one_shot = true
 	add_child(_reload_timer)
 	_reload_timer.timeout.connect(_finish_reload)
 
-	button_down.connect(_on_button_down)
-	button_up.connect(_on_button_up)
-	mouse_exited.connect(_on_mouse_exited)
+	pressed.connect(_toggle_auto_fire)
 
 	_update_weapon_label()
 
-func _on_button_down() -> void:
-	_is_holding = true
+func _toggle_auto_fire() -> void:
+	_auto_fire = not _auto_fire
+	auto_fire_changed.emit(_auto_fire)
 
+	if _auto_fire:
+		# 关键：延迟到本帧末尾，确保 Game 的 _on_weapon_pressed 先把血回满
+		call_deferred("_try_fire_now_or_schedule")
+	else:
+		_stop_fire_timer()
+
+	_update_weapon_label()
+
+func stop_auto_fire() -> void:
+	_auto_fire = false
+	auto_fire_changed.emit(false)
+	_stop_fire_timer()
+	_update_weapon_label()
+
+func _try_fire_now_or_schedule() -> void:
+	if not _auto_fire:
+		return
 	if _is_reloading:
 		return
-
 	if _shots_left <= 0:
 		_start_reload()
 		return
-
-	# 冷却结束：立刻打一发并进入冷却
 	if _fire_timer.is_stopped():
 		_fire_one_and_start_cooldown()
-	else:
-		# 冷却中：把这次单点缓冲起来，等冷却到了再打（不会超速）
-		_queued_shots = min(_queued_shots + 1, max_queue)
 
-func _on_button_up() -> void:
-	_is_holding = false
-	# 关键：不要 stop _fire_timer
-	# 也不要清空 _queued_shots（否则单点缓冲就没了）
-
-func _on_mouse_exited() -> void:
-	_is_holding = false
-	# 同样不要 stop _fire_timer
-
-func _on_fire_ready() -> void:
-	# 冷却到点后：
-	# 1) 还在按住 -> 连射继续
-	# 2) 没按住但有排队点击 -> 也打一发（实现“单点也遵循 fire rate”）
+func _on_fire_timer_timeout() -> void:
+	if not _auto_fire:
+		return
 	if _is_reloading:
 		return
-
 	if _shots_left <= 0:
 		_start_reload()
 		return
-
-	var should_fire := _is_holding or _queued_shots > 0
-	if not should_fire:
-		return
-
-	if _queued_shots > 0:
-		_queued_shots -= 1
-
 	_fire_one_and_start_cooldown()
 
 func _fire_one_and_start_cooldown() -> void:
-	if _is_reloading:
+	if _is_reloading or not _auto_fire:
 		return
-
 	if _shots_left <= 0:
 		_start_reload()
 		return
 
-	# 开火
 	_shots_left -= 1
 	deal_damage.emit(_roll_damage_one_shot())
 	_update_weapon_label()
 
-	# 打空自动换弹
 	if _shots_left <= 0:
 		_start_reload()
 		return
 
-	# 进入冷却：严格按 RPM
 	_fire_timer.wait_time = _shot_interval()
 	_fire_timer.start()
 
@@ -113,9 +98,7 @@ func _start_reload() -> void:
 	if _is_reloading:
 		return
 	_is_reloading = true
-
-	# 可选：换弹时清空缓冲，避免“欠账”
-	_queued_shots = 0
+	_stop_fire_timer()
 
 	_reload_timer.wait_time = reload_time
 	_reload_timer.start()
@@ -125,10 +108,12 @@ func _finish_reload() -> void:
 	_is_reloading = false
 	_shots_left = mag_size
 	_update_weapon_label()
+	if _auto_fire:
+		_try_fire_now_or_schedule()
 
-	# 换完弹：如果还在按住，且当前不在冷却，就立刻打一发进入冷却
-	if _is_holding and _fire_timer.is_stopped():
-		_fire_one_and_start_cooldown()
+func _stop_fire_timer() -> void:
+	if not _fire_timer.is_stopped():
+		_fire_timer.stop()
 
 func _shot_interval() -> float:
 	if rpm <= 0.0:
@@ -140,10 +125,14 @@ func _roll_damage_one_shot() -> float:
 	return base_damage * (2.0 if is_crit else 1.0)
 
 func _update_weapon_label() -> void:
+	if label == null:
+		return
+
 	var state := ""
 	if _is_reloading:
 		state = " | Reloading..."
 	else:
 		state = " | Ammo: %d/%d" % [_shots_left, mag_size]
 
-	label.text = "RPM: %.0f | DMG: %.0f | Mag: %d%s" % [rpm, base_damage, mag_size, state]
+	var firing := "ON" if _auto_fire else "OFF"
+	label.text = "Auto: %s | RPM: %.0f | DMG: %.0f | Mag: %d%s" % [firing, rpm, base_damage, mag_size, state]
